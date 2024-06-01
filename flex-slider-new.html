@@ -113,6 +113,10 @@
                                 this.handleConfig()
                                 this.initSlider()
                             })
+
+                            if (this.autoplay) {
+                                this.handleAutoplay()
+                            }
                         }
                     }
 
@@ -127,6 +131,7 @@
                 this.viewItem = config.viewItem ? config.viewItem : 1
                 this.gap = config.gap ? config.gap : 0
                 this.autoplay = config.autoplay ? config.autoplay : false
+                this.speed = config.speed ? config.speed : 2000
                 this.disabled = config.disabled ? config.disabled : false
 
                 if (config.responsive) {
@@ -142,6 +147,7 @@
                                 this.pagination = value.pagination === undefined ? this.pagination : value.pagination
                                 this.arrow = value.arrow === undefined ? this.arrow : value.arrow
                                 this.arrow = value.autoplay === undefined ? this.autoplay : value.autoplay
+                                this.speed = value.speed ? value.speed : this.speed
                                 break
                             }
                         }
@@ -191,6 +197,14 @@
                 });
             }
 
+            handleAutoplay() {
+                if (this.autoplay) {
+                    this.autoplayInterval = setInterval(() => {
+                        this.gotoNextPrev(1)
+                    }, this.speed)
+                }
+            }
+
             handleArrow() {
                 try {
                     if (this.sliderContainer.querySelector(".flex-slider-arrow")) {
@@ -230,8 +244,9 @@
                     behavior: 'smooth'
                 })
                 this.activeIndex += direction
+                if(this.activeIndex >= this.size) this.goToSlide(0, 'instant')
                 this.activeIndex >= this.size ? this.activeIndex = this.size - 1 : this.activeIndex <= 0 ? this.activeIndex = 0 : this.activeIndex
-                this.setActiveClass(this.activeIndex)
+                this.setActiveClass(this.activeIndex)                
             }
 
             handlePagination() {
@@ -271,13 +286,13 @@
                 })
             }
 
-            goToSlide(index) {
+            goToSlide(index, behavior='smooth') {
                 if (this.disabled) return
                 let slide = this.slides[index]
                 let left = slide.offsetLeft - this.sliderWrapper.offsetLeft
                 this.sliderWrapper.scrollTo({
                     left: left,
-                    behavior: 'smooth'
+                    behavior: behavior
                 })
                 this.setActiveClass(index)
             }
@@ -368,6 +383,7 @@
             viewItem: 4,
             gap: 15,
             autoplay: true,
+            speed: 2000,
             responsive: {
                 768: {
                     gap: 10,
